@@ -21,48 +21,17 @@ func getEnv(key, fallback string) string {
 }
 
 var (
-	schedulerHealthy = prometheus.NewGaugeVec(
+	componentStatus = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "kube_scheduler_healthy",
-			Help: "Scheduler healthy",
+			Name: "kube_componentstatus_healthy",
+			Help: "Kubernetes componentstatus healthy",
 		},
-		[]string{"job"},
-	)
-
-	controllerManagerHealthy = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "kube_controller_manager_healthy",
-			Help: "Control-manager healthy",
-		},
-		[]string{"job"},
-	)
-
-	etcdHealthy = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: "kube_etcd_healthy",
-			Help: "etcd healthy",
-		},
-		[]string{"job"},
+		[]string{"component"},
 	)
 )
 
 func init() {
-	prometheus.MustRegister(schedulerHealthy)
-	prometheus.MustRegister(controllerManagerHealthy)
-	prometheus.MustRegister(etcdHealthy)
-}
-
-func reportStatus(component string, healthy float64) {
-	switch component {
-	case "scheduler":
-		schedulerHealthy.With(prometheus.Labels{"job": "kube-scheduler"}).Set(healthy)
-	case "controller-manager":
-		controllerManagerHealthy.With(prometheus.Labels{"job": "kube-controller-manager"}).Set(healthy)
-	case "etcd-0":
-		etcdHealthy.With(prometheus.Labels{"job": "kube-etcd"}).Set(healthy)
-	default:
-		fmt.Printf("Unknown component %s.", component)
-	}
+	prometheus.MustRegister(componentStatus)
 }
 
 func getComponentStatuses() {
@@ -90,10 +59,10 @@ func getComponentStatuses() {
 		for _, componentstatus := range componetstatuses.Items {
 			if health_conditions[componentstatus.Conditions[0].Message] {
 				fmt.Printf("%s: %s\n", componentstatus.Name, "OK")
-				reportStatus(componentstatus.Name, 1)
+				componentStatus.With(prometheus.Labels{"component": componentstatus.Name}).Set(1.0)
 			} else {
 				fmt.Printf("%s: %s, message: %s\n", componentstatus.Name, "FAILURE", componentstatus.Conditions[0].Message)
-				reportStatus(componentstatus.Name, 0)
+				componentStatus.With(prometheus.Labels{"component": componentstatus.Name}).Set(0.0)
 			}
 		}
 
