@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "kube-componentstatuses-prometheus-exporter.fullname" . }}
+  labels:
+    app: {{ template "kube-componentstatuses-prometheus-exporter.name" . }}
+    chart: {{ template "kube-componentstatuses-prometheus-exporter.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "kube-componentstatuses-prometheus-exporter.name" . }}
+    release: {{ .Release.Name }}

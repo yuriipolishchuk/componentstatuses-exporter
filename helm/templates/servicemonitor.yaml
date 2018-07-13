@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "kube-componentstatuses-prometheus-exporter.fullname" . }}
+  labels:
+    app: {{ template "kube-componentstatuses-prometheus-exporter.name" . }}
+    chart: {{ template "kube-componentstatuses-prometheus-exporter.chart" . }}
+    prometheus: {{ .Values.prometheus }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  endpoints:
+  - interval: 30s
+    port: http
+  jobLabel: k8s-statuses
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      app: {{ template "kube-componentstatuses-prometheus-exporter.name" . }}
+      release: {{ .Release.Name }}

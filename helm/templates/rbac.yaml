@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: k8s-componentstatuses-exporter
-  namespace: kube-system
+  name: {{ template "kube-componentstatuses-prometheus-exporter.fullname" . }}
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -12,7 +11,7 @@ metadata:
     rbac.authorization.kubernetes.io/autoupdate: "true"
   labels:
     kubernetes.io/bootstrapping: rbac-defaults
-  name: k8s-componentstatuses-exporter
+  name: {{ template "kube-componentstatuses-prometheus-exporter.fullname" . }}
 rules:
 - apiGroups:
   - ""
@@ -25,12 +24,12 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
-  name: k8s-componentstatuses-exporter
+  name: {{ template "kube-componentstatuses-prometheus-exporter.fullname" . }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: k8s-componentstatuses-exporter
+  name: {{ template "kube-componentstatuses-prometheus-exporter.fullname" . }}
 subjects:
 - kind: ServiceAccount
-  name: k8s-componentstatuses-exporter
-  namespace: kube-system
+  name: {{ template "kube-componentstatuses-prometheus-exporter.fullname" . }}
+  namespace: {{ .Release.Namespace }}
