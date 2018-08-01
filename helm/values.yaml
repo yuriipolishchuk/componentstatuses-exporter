@@ -6,8 +6,8 @@ replicaCount: 1
 
 image:
   repository: yuriipolishchuk/kube-componentstatuses-prometheus-exporter
-  tag: latest
-  pullPolicy: Always
+  tag: 0.1.0
+  pullPolicy: IfNotPresent
 
 prometheus: kube-prometheus
 
