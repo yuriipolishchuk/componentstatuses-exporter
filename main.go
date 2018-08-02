@@ -10,7 +10,9 @@ import (
 	"k8s.io/client-go/rest"
 	"net/http"
 	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
 )
 
 func getEnv(key, fallback string) string {
@@ -75,7 +77,22 @@ func getComponentStatuses() {
 	}
 }
 
+func handleGracefulShutdown() {
+	var gracefulStop = make(chan os.Signal)
+
+	signal.Notify(gracefulStop, syscall.SIGTERM)
+	signal.Notify(gracefulStop, syscall.SIGINT)
+
+	go func() {
+		sig := <-gracefulStop
+		fmt.Printf("caught sig: %+v", sig)
+		os.Exit(0)
+	}()
+}
+
 func main() {
+	handleGracefulShutdown()
+
 	go getComponentStatuses()
 
 	http.Handle("/metrics", prometheus.Handler())
