@@ -18,6 +18,8 @@ spec:
       labels:
         app: {{ template "kube-componentstatuses-prometheus-exporter.name" . }}
         release: {{ .Release.Name }}
+      annotations:
+{{ toYaml .Values.annotations | indent 8 }}
     spec:
       serviceAccountName: {{ template "kube-componentstatuses-prometheus-exporter.fullname" . }}
       containers:
