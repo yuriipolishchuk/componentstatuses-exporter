@@ -1,6 +1,13 @@
+image=yuriipolishchuk/kube-componentstatuses-prometheus-exporter
+
 build:
-	docker build -t yuriipolishchuk/kube-componentstatuses-prometheus-exporter .
+	gofmt -w .
+	docker build -t ${image} .
 
 push:
-	docker tag yuriipolishchuk/kube-componentstatuses-prometheus-exporter yuriipolishchuk/kube-componentstatuses-prometheus-exporter:${tag}
-	docker push yuriipolishchuk/kube-componentstatuses-prometheus-exporter:${tag}
+	docker push ${image}:latest
+ifdef tag
+	docker tag ${image} ${image}:${tag}
+	docker push ${image}:${tag}
+endif
+
