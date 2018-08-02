@@ -3,9 +3,6 @@ Simple app which polls kubernetes component statuses over API and exports them t
 
 Can be usefull for monitoring k8s components statuses on managed solutitions like AWS EKS.
 
-# Prerequisites
-[kube-prometheus](https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus)
-
 # Installation
 ```
 git clone git@github.com:yuriipolishchuk/kube-componentstatuses-prometheus-exporter.git
@@ -35,6 +32,8 @@ kube_componentstatus_healthy{component="scheduler"} 1
 Helm chart installs ServiceAccount, ClusterRole and ClusterRoleBinding to allow pod quering k8s `api/componentstatuses`
 
 # Prometheus
-For scraping metrics [coreos prometheus operator](https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus) is used. Helm chart deploys ServiceMonitor.
+[coreos prometheus operator](https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus) ServiceMonitor can be deployed or
+metrics scraping can be configured via pod annotations.
 
-Don't forget to update `prometheus` parameter value in `values.yaml`.
+To configure follow instructions in [values.yaml](./helm/values.yaml)
+

@@ -9,7 +9,14 @@ image:
   tag: 0.1.0
   pullPolicy: IfNotPresent
 
-prometheus: kube-prometheus
+annotations: {}
+  # Uncomment to allow metrics scraping and remove the curly braces after 'annotations:'.
+  # prometheus.io/scrape: 'true'
+  # prometheus.io/port: '8080'
+
+ServiceMonitor: {}
+  # Uncomment to deploy ServiceMonitor for prometheus-operator and remove the curly braces after 'ServiceMonitor:'.
+  # prometheus: kube-prometheus
 
 componentstatuses_check_rate: 30
 

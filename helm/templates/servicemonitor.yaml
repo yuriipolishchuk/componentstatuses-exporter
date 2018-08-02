@@ -1,3 +1,4 @@
+{{- if .Values.ServiceMonitor }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
@@ -5,7 +6,7 @@ metadata:
   labels:
     app: {{ template "kube-componentstatuses-prometheus-exporter.name" . }}
     chart: {{ template "kube-componentstatuses-prometheus-exporter.chart" . }}
-    prometheus: {{ .Values.prometheus }}
+    prometheus: {{ .Values.ServiceMonitor.prometheus }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
@@ -20,3 +21,4 @@ spec:
     matchLabels:
       app: {{ template "kube-componentstatuses-prometheus-exporter.name" . }}
       release: {{ .Release.Name }}
+{{- end }}
