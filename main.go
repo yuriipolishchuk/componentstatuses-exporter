@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-	"time"
-
 	"github.com/prometheus/client_golang/prometheus"
+	log "github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -13,6 +12,7 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
+	"time"
 )
 
 func getEnv(key, fallback string) string {
@@ -30,9 +30,28 @@ var (
 		},
 		[]string{"component"},
 	)
+
+	health_conditions = map[string]bool{
+		"ok": true,
+		"{\"health\": \"true\"}": true,
+	}
+
+	refreshRate int
 )
 
 func init() {
+	handleGracefulShutdown()
+
+	//  configure logger
+	log.RegisterExitHandler(handleGracefulShutdown)
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+	level, err := log.ParseLevel(getEnv("LOG_LEVEL", "info"))
+	if err != nil {
+		panic(err.Error())
+	}
+	log.SetLevel(level)
+
 	prometheus.MustRegister(componentStatus)
 }
 
@@ -42,35 +61,42 @@ func getComponentStatuses() {
 	if err != nil {
 		panic(err.Error())
 	}
+
 	// creates the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		panic(err.Error())
 	}
+
+	refreshRate, err := strconv.Atoi(getEnv("COMPONENTSTATUSES_CHECK_RATE", "10"))
+	if err != nil {
+		panic(err.Error())
+	}
+
 	for {
+		// get component statuses
 		componetstatuses, err := clientset.CoreV1().ComponentStatuses().List(metav1.ListOptions{})
 		if err != nil {
 			panic(err.Error())
 		}
 
-		health_conditions := map[string]bool{
-			"ok": true,
-			"{\"health\": \"true\"}": true,
-		}
-
 		for _, componentstatus := range componetstatuses.Items {
-			if health_conditions[componentstatus.Conditions[0].Message] {
-				fmt.Printf("%s: %s\n", componentstatus.Name, "OK")
-				componentStatus.With(prometheus.Labels{"component": componentstatus.Name}).Set(1.0)
-			} else {
-				fmt.Printf("%s: %s, message: %s\n", componentstatus.Name, "FAILURE", componentstatus.Conditions[0].Message)
-				componentStatus.With(prometheus.Labels{"component": componentstatus.Name}).Set(0.0)
-			}
-		}
+			var metricValue float64
 
-		refreshRate, err := strconv.Atoi(getEnv("COMPONENTSTATUSES_CHECK_RATE", "10"))
-		if err != nil {
-			panic(err.Error())
+			msg := fmt.Sprintf("%s: %s", componentstatus.Name, componentstatus.Conditions[0].Message)
+
+			healthy := health_conditions[componentstatus.Conditions[0].Message]
+			if healthy {
+				metricValue = 1.0
+				log.Info(msg)
+			} else {
+				metricValue = 0.0
+				log.Error(msg)
+			}
+
+			// export metrics
+			componentStatus.With(prometheus.Labels{"component": componentstatus.Name}).Set(metricValue)
+
 		}
 
 		time.Sleep(time.Duration(refreshRate) * time.Second)
@@ -85,14 +111,12 @@ func handleGracefulShutdown() {
 
 	go func() {
 		sig := <-gracefulStop
-		fmt.Printf("caught sig: %+v", sig)
+		log.Info(fmt.Sprintf("Caught signal: %v", sig))
 		os.Exit(0)
 	}()
 }
 
 func main() {
-	handleGracefulShutdown()
-
 	go getComponentStatuses()
 
 	http.Handle("/metrics", prometheus.Handler())

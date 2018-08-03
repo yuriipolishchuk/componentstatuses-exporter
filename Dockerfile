@@ -6,17 +6,16 @@ RUN go get -d -v \
     k8s.io/client-go/kubernetes \
     k8s.io/client-go/rest \
     github.com/prometheus/client_golang/prometheus \
+    github.com/sirupsen/logrus \
     ;
 
 COPY main.go .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o exporter .
 
 
-FROM alpine
+FROM alpine:3.8
 
-ENV COMPONENTSTATUSES_CHECK_RATE=30
+COPY --from=builder /go/src/github.com/yuriipolishchuk/kube-componentstatuses-prometheus-exporter/exporter .
 
-COPY --from=builder /go/src/github.com/yuriipolishchuk/kube-componentstatuses-prometheus-exporter/app .
-
-CMD ["/app"]
+CMD ["/exporter"]
