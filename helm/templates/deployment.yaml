@@ -27,8 +27,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: COMPONENTSTATUSES_CHECK_RATE
-              value: "{{ .Values.componentstatuses_check_rate }}"
+{{ toYaml .Values.env | indent 12 }}
           ports:
             - name: http
               containerPort: 8080
