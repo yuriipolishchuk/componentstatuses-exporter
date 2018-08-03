@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: yuriipolishchuk/kube-componentstatuses-prometheus-exporter
-  tag: 0.1.1
+  tag: 0.1.2
   pullPolicy: IfNotPresent
 
 annotations: {}
@@ -18,7 +18,11 @@ ServiceMonitor: {}
   # Uncomment to deploy ServiceMonitor for prometheus-operator and remove the curly braces after 'ServiceMonitor:'.
   # prometheus: kube-prometheus
 
-componentstatuses_check_rate: 30
+env:
+  - name: COMPONENTSTATUSES_CHECK_RATE
+    value: '30'
+  - name: LOG_LEVEL
+    value: info
 
 service:
   type: ClusterIP
