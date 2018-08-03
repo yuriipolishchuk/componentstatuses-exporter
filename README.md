@@ -21,11 +21,11 @@ Handling connection for 8080
 
 http localhost:8080/metrics | grep kube
 Handling connection for 8080
-# HELP kube_componentstatus_healthy Kubernetes componentstatus healthy
-# TYPE kube_componentstatus_healthy gauge
-kube_componentstatus_healthy{component="controller-manager"} 1
-kube_componentstatus_healthy{component="etcd-0"} 1
-kube_componentstatus_healthy{component="scheduler"} 1
+# HELP kube_componentstatuses Kubernetes component status health
+# TYPE kube_componentstatuses gauge
+kube_componentstatuses{component="controller-manager"} 1
+kube_componentstatuses{component="etcd-0"} 1
+kube_componentstatuses{component="scheduler"} 1
 ```
 
 # RBAC

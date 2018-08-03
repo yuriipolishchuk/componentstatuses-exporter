@@ -25,8 +25,8 @@ func getEnv(key, fallback string) string {
 var (
 	componentStatus = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "kube_componentstatus_healthy",
-			Help: "Kubernetes componentstatus healthy",
+			Name: "kube_componentstatuses",
+			Help: "Kubernetes component status health",
 		},
 		[]string{"component"},
 	)
