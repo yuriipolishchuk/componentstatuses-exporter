@@ -1,19 +1,17 @@
-# kube-componentstatuses-prometheus-exporter
+# componentstatuses-exporter
 Simple app which polls kubernetes component statuses over API and exports them them via HTTP for Prometheus consumption
 
 Can be usefull for monitoring k8s components statuses on managed solutitions like AWS EKS.
 
 # Installation
 ```
-git clone git@github.com:yuriipolishchuk/kube-componentstatuses-prometheus-exporter.git
-cd kube-componentstatuses-prometheus-exporter/helm
-
-helm install .
+git clone git@github.com:yuriipolishchuk/componentstatuses-exporter.git
+helm install componentstatuses-exporter/helm
 ```
 
 # Results
 ```
-export POD_NAME=$(kubectl get pods --namespace core -l "app=kube-componentstatuses-prometheus-exporter,release=k8s-statuses" -o jsonpath="{.items[0].metadata.name}")
+export POD_NAME=$(kubectl get pods --namespace core -l "app=componentstatuses-exporter,release=k8s-statuses" -o jsonpath="{.items[0].metadata.name}")
 
 kubectl port-forward $POD_NAME 8080:8080 &
 Forwarding from 127.0.0.1:8080 -> 8080

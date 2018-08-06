@@ -1,4 +1,4 @@
-image=yuriipolishchuk/kube-componentstatuses-prometheus-exporter
+image=polishchuk/componentstatuses-exporter
 
 build:
 	gofmt -w .

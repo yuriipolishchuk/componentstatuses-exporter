@@ -1,27 +1,27 @@
 apiVersion: apps/v1beta2
 kind: Deployment
 metadata:
-  name: {{ template "kube-componentstatuses-prometheus-exporter.fullname" . }}
+  name: {{ template "componentstatuses-exporter.fullname" . }}
   labels:
-    app: {{ template "kube-componentstatuses-prometheus-exporter.name" . }}
-    chart: {{ template "kube-componentstatuses-prometheus-exporter.chart" . }}
+    app: {{ template "componentstatuses-exporter.name" . }}
+    chart: {{ template "componentstatuses-exporter.chart" . }}
     release: {{ .Release.Name }}
     heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ template "kube-componentstatuses-prometheus-exporter.name" . }}
+      app: {{ template "componentstatuses-exporter.name" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "kube-componentstatuses-prometheus-exporter.name" . }}
+        app: {{ template "componentstatuses-exporter.name" . }}
         release: {{ .Release.Name }}
       annotations:
 {{ toYaml .Values.annotations | indent 8 }}
     spec:
-      serviceAccountName: {{ template "kube-componentstatuses-prometheus-exporter.fullname" . }}
+      serviceAccountName: {{ template "componentstatuses-exporter.fullname" . }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"

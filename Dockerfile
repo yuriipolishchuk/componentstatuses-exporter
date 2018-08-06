@@ -1,6 +1,6 @@
 FROM golang:1.10.3 as builder
 
-WORKDIR /go/src/github.com/yuriipolishchuk/kube-componentstatuses-prometheus-exporter/
+WORKDIR /go/src/github.com/yuriipolishchuk/componentstatuses-exporter/
 
 RUN go get -d -v \
     k8s.io/client-go/kubernetes \
@@ -16,6 +16,6 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o exporter .
 
 FROM alpine:3.8
 
-COPY --from=builder /go/src/github.com/yuriipolishchuk/kube-componentstatuses-prometheus-exporter/exporter .
+COPY --from=builder /go/src/github.com/yuriipolishchuk/componentstatuses-exporter/exporter .
 
 CMD ["/exporter"]
