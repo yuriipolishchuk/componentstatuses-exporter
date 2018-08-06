@@ -15,13 +15,6 @@ import (
 	"time"
 )
 
-func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
-}
-
 var (
 	componentStatus = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
@@ -39,20 +32,11 @@ var (
 	refreshRate int
 )
 
-func init() {
-	handleGracefulShutdown()
-
-	//  configure logger
-	log.RegisterExitHandler(handleGracefulShutdown)
-	log.SetFormatter(&log.JSONFormatter{})
-	log.SetOutput(os.Stdout)
-	level, err := log.ParseLevel(getEnv("LOG_LEVEL", "info"))
-	if err != nil {
-		panic(err.Error())
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
 	}
-	log.SetLevel(level)
-
-	prometheus.MustRegister(componentStatus)
+	return fallback
 }
 
 func getComponentStatuses() {
@@ -114,6 +98,22 @@ func handleGracefulShutdown() {
 		log.Info(fmt.Sprintf("Caught signal: %v", sig))
 		os.Exit(0)
 	}()
+}
+
+func init() {
+	handleGracefulShutdown()
+
+	//  configure logger
+	log.RegisterExitHandler(handleGracefulShutdown)
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+	level, err := log.ParseLevel(getEnv("LOG_LEVEL", "info"))
+	if err != nil {
+		panic(err.Error())
+	}
+	log.SetLevel(level)
+
+	prometheus.MustRegister(componentStatus)
 }
 
 func main() {
