@@ -1,4 +1,4 @@
-FROM golang:1.10.3 as builder
+FROM golang:1.12 as builder
 
 WORKDIR /go/src/github.com/yuriipolishchuk/componentstatuses-exporter/
 
@@ -14,7 +14,7 @@ COPY main.go .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o exporter .
 
 
-FROM alpine:3.8
+FROM alpine:3.9
 
 COPY --from=builder /go/src/github.com/yuriipolishchuk/componentstatuses-exporter/exporter .
 
