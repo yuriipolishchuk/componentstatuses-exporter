@@ -5,8 +5,9 @@ Can be usefull for monitoring k8s components statuses on managed solutitions lik
 
 # Installation
 ```
-git clone git@github.com:yuriipolishchuk/componentstatuses-exporter.git
-helm install componentstatuses-exporter/helm
+helm repo add componentstatuses-exporter https://raw.githubusercontent.com/yuriipolishchuk/componentstatuses-exporter/master/helm/
+helm repo update
+helm install componentstatuses-exporter/componentstatuses-exporter
 ```
 
 # Results
