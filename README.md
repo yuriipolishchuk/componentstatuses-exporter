@@ -34,5 +34,5 @@ Helm chart installs ServiceAccount, ClusterRole and ClusterRoleBinding to allow 
 [coreos prometheus operator](https://github.com/coreos/prometheus-operator/tree/master/contrib/kube-prometheus) ServiceMonitor can be deployed or
 metrics scraping can be configured via pod annotations.
 
-To configure follow instructions in [values.yaml](./helm/values.yaml)
+To configure follow instructions in [values.yaml](./helm/componentstatuses-exporter/values.yaml)
 
