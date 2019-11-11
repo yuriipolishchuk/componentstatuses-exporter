@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -24,11 +25,6 @@ var (
 		},
 		[]string{"component"},
 	)
-
-	healthConditions = map[string]bool{
-		"ok":                     true,
-		"{\"health\": \"true\"}": true,
-	}
 
 	refreshRate int
 )
@@ -66,10 +62,10 @@ func getComponentStatuses() {
 		for _, componentstatus := range componetstatuses.Items {
 			var metricValue float64
 
+			status := componentstatus.Conditions[0].Status
 			msg := fmt.Sprintf("%s: %s", componentstatus.Name, componentstatus.Conditions[0].Message)
 
-			healthy := healthConditions[componentstatus.Conditions[0].Message]
-			if healthy {
+			if status == "True" {
 				metricValue = 1.0
 				log.Info(msg)
 			} else {
@@ -116,6 +112,6 @@ func init() {
 func main() {
 	go getComponentStatuses()
 
-	http.Handle("/metrics", prometheus.Handler())
+	http.Handle("/metrics", promhttp.Handler())
 	http.ListenAndServe(":8080", nil)
 }
